@@ -16,6 +16,10 @@ return new class extends Migration
         $table->unsignedBigInteger('id_contenu');
         $table->unsignedBigInteger('id_lecteur');
         $table->string('id_transaction')->nullable(); 
+        $table->decimal('montant', 10, 2);
+        $table->string('methode_paiement')->default('fedapay');
+        $table->string('statut')->default('pending'); // pending, success, failed
+        $table->json('metadata')->nullable();
         $table->timestamp('date_paiement')->useCurrent();
         $table->timestamps();
 
