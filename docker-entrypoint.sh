@@ -57,7 +57,8 @@ php artisan storage:link || true
 echo "Running migrations and seeds (FRESH start)..."
 # ALERT: This wipes the database and re-seeds it. 
 # Necessary to fix the duplication/inconsistency issues reported.
-php artisan migrate:fresh --seed --force > /var/www/html/storage/logs/seed_output.log 2>&1
+# REMOVED REDIRECTION to see errors in Railway logs if it fails.
+php artisan migrate:fresh --seed --force
 
 # Note: We removed the separate 'db:seed' command because 'migrate:fresh --seed' does both.
 
