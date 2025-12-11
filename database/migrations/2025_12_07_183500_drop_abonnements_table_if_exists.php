@@ -9,8 +9,8 @@ return new class extends Migration
 {
     public function up()
     {
-        // Supprimer la table si elle existe (avec CASCADE pour PostgreSQL)
-        DB::statement('DROP TABLE IF EXISTS abonnements CASCADE');
+        // Supprimer la table si elle existe (méthode compatible tous drivers)
+        Schema::dropIfExists('abonnements');
     }
 
     public function down()

@@ -5,10 +5,10 @@ set -e
 PORT=${PORT:-80}
 
 echo "Configuring Apache to listen on port $PORT..."
-# Replace 'Listen 80' with 'Listen $PORT' in ports.conf
-sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf
-# Replace '<VirtualHost *:80>' with '<VirtualHost *:$PORT>' in 000-default.conf
-sed -i "s/:80/:$PORT/g" /etc/apache2/sites-available/000-default.conf
+# Replace 'Listen 80' with 'Listen $PORT' (exact match)
+sed -i "s/^Listen 80$/Listen $PORT/g" /etc/apache2/ports.conf
+# Replace '<VirtualHost *:80>' with '<VirtualHost *:$PORT>'
+sed -i "s/<VirtualHost \*:80>/<VirtualHost *:$PORT>/g" /etc/apache2/sites-available/000-default.conf
 
 # Verify changes
 echo "Checking ports.conf:"
