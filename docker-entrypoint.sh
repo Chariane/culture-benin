@@ -36,6 +36,24 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Start PHP Built-in Server (Temporary Debugging)
+# Start PHP Built-in Server (Temporary Debugging with Internal Check)
 echo "Starting PHP Built-in Server on 0.0.0.0:$PORT..."
-exec php artisan serve --host=0.0.0.0 --port=$PORT
+php artisan serve --host=0.0.0.0 --port=$PORT &
+SERVER_PID=$!
+
+echo "Waiting 5 seconds for server startup..."
+sleep 5
+
+echo "--- INTERNAL CONNECTIVITY CHECK ---"
+echo "Testing IPv4 (127.0.0.1:$PORT)..."
+curl -I -v http://127.0.0.1:$PORT || echo ">>> CURL IPv4 FAILED"
+
+echo "Testing IPv6 ([::1]:$PORT)..."
+curl -I -v http://[::1]:$PORT || echo ">>> CURL IPv6 FAILED"
+
+echo "Process Status:"
+ps -p $SERVER_PID -f || echo ">>> PROCESS $SERVER_PID IS DEAD"
+echo "--- END CONNECTIVITY CHECK ---"
+
+# Wait for the server process to keep container alive
+wait $SERVER_PID
