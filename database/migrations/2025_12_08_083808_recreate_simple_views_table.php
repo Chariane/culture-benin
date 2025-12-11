@@ -9,8 +9,10 @@ return new class extends Migration
 {
     public function up()
     {
-        // 1. D'abord, supprimer la vue matérialisée qui dépend de la table
-        DB::statement('DROP MATERIALIZED VIEW IF EXISTS vue_statistiques_contenu');
+        // 1. D'abord, supprimer la vue matérialisée qui dépend de la table (uniquement PostgreSQL)
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('DROP MATERIALIZED VIEW IF EXISTS vue_statistiques_contenu');
+        }
         
         // 2. Maintenant, supprimer la table views
         Schema::dropIfExists('views');
