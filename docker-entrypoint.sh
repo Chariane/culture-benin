@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+
+# Default to 80 if PORT is not set
+PORT=${PORT:-80}
+
+echo "Configuring Apache to listen on port $PORT..."
+# Replace 'Listen 80' with 'Listen $PORT' in ports.conf
+sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf
+# Replace '<VirtualHost *:80>' with '<VirtualHost *:$PORT>' in 000-default.conf
+sed -i "s/:80/:$PORT/g" /etc/apache2/sites-available/000-default.conf
+
+# Verify changes
+echo "Checking ports.conf:"
+grep "Listen" /etc/apache2/ports.conf
+
+# Run system requirements
+echo "Linking storage..."
+php artisan storage:link || true
+
+echo "Running migrations..."
+php artisan migrate --force
+
+echo "Caching configuration..."
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Start Apache
+echo "Starting Apache..."
+exec apache2-foreground
