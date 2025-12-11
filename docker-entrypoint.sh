@@ -27,20 +27,25 @@ echo "Configuring Apache to listen on port $PORT..."
 # 1. Fix "Could not reliably determine the server's fully qualified domain name"
 echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# 2. Update ports.conf to Listen on 0.0.0.0:$PORT (Forces IPv4, fixes binding issues)
-# Replaces "Listen 80" or "Listen <any_number>" with "Listen 0.0.0.0:$PORT"
-sed -i "s/^Listen [0-9]\{1,\}.*/Listen 0.0.0.0:$PORT/g" /etc/apache2/ports.conf
+# 2. STRATEGY CHANGE: Overwrite ports.conf entirely.
+# We remove all existing Listen directives (including 443) and set only the one we need.
+# We also avoid specifying 0.0.0.0 to allow Apache to bind to IPv6 if the environment prefers it.
+echo "Listen $PORT" > /etc/apache2/ports.conf
 
 # 3. Update Default VirtualHost to match the new port
-# Replaces <VirtualHost *:80> with <VirtualHost *:$PORT>
+# Replaces <VirtualHost *:80> or any other port with <VirtualHost *:$PORT>
 sed -i "s/<VirtualHost \*:[0-9]\{1,\}>/<VirtualHost *:$PORT>/g" /etc/apache2/sites-available/000-default.conf
 
 # Verify Configuration changes in logs
 echo "--- APACHE CONFIG CHECK ---"
 echo ">> /etc/apache2/ports.conf:"
-grep "Listen" /etc/apache2/ports.conf
+cat /etc/apache2/ports.conf
 echo ">> /etc/apache2/sites-available/000-default.conf (top):"
 grep "VirtualHost" /etc/apache2/sites-available/000-default.conf | head -n 1
+echo ">> Checking for other 'Listen' directives in /etc/apache2:"
+grep -r "Listen" /etc/apache2/ || true
+echo ">> Checking enabled sites:"
+ls -l /etc/apache2/sites-enabled/
 echo "--- END CONFIG CHECK ---"
 
 # Run system requirements
