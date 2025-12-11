@@ -43,9 +43,20 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 # Exposer le port 80 (standard Railway pour Apache)
 EXPOSE 80
 
-# Script de démarrage personnalisé pour lancer les migrations puis Apache
-# On crée ce script à la volée
-RUN echo "#!/bin/sh\nphp artisan migrate --force\nphp artisan storage:link\nphp artisan config:cache\nphp artisan route:cache\nphp artisan view:cache\napache2-foreground" > /usr/local/bin/start-container
+# Script de démarrage personnalisé
+RUN echo "#!/bin/sh\n\
+    # Configurer le port Apache dynamiquement selon la variable PORT de Railway\n\
+    sed -i \"s/80/\${PORT:-80}/g\" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf\n\
+    \n\
+    # Exécuter les migrations et le cache\n\
+    php artisan migrate --force\n\
+    php artisan storage:link\n\
+    php artisan config:cache\n\
+    php artisan route:cache\n\
+    php artisan view:cache\n\
+    \n\
+    # Démarrer Apache\n\
+    apache2-foreground" > /usr/local/bin/start-container
 RUN chmod +x /usr/local/bin/start-container
 
 CMD ["/usr/local/bin/start-container"]
