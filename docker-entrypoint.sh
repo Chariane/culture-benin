@@ -11,9 +11,14 @@ echo "DB_HOST is set to: '$DB_HOST'"
 echo "--- END DEBUG ---"
 
 if [ -z "$DB_CONNECTION" ]; then
-    echo "ERROR: DB_CONNECTION variable is missing!"
-    echo "Please configure it in Railway variables."
-    exit 1
+    if [ -n "$DATABASE_URL" ]; then
+        echo "WARNING: DB_CONNECTION missing, but DATABASE_URL found. Defaulting to 'pgsql'."
+        export DB_CONNECTION=pgsql
+    else
+        echo "ERROR: DB_CONNECTION variable is missing and no DATABASE_URL found!"
+        echo "Please configure it in Railway variables."
+        exit 1
+    fi
 fi
 
 echo "Configuring Apache to listen on port $PORT..."
