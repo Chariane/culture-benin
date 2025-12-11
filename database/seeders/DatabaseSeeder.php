@@ -15,19 +15,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        // Ordre strict à respecter pour éviter les erreurs de clés étrangères
         $this->call([
-            RoleSeeder::class
+            RoleSeeder::class,          // 1. Rôles
+            LangueSeeder::class,        // 2. Langues
+            RegionSeeder::class,        // 3. Régions
+            TypeContenuSeeder::class,   // 4. Types de contenus
+            TypeMediaSeeder::class,     // 5. Types de médias
+            UtilisateurSeeder::class,   // 6. Utilisateurs (dépend des Rôles)
+            ContenuSeeder::class,       // 7. Contenus (dépend de tout ce qui précède)
+            MediaSeeder::class,         // 8. Médias (dépend de Contenu et TypeMedia)
         ]);
-
-        $this->call([
-            LangueSeeder::class
-        ]);
-
-        $this->call([
-            RegionSeeder::class,
-        ]);
-
     }
 }

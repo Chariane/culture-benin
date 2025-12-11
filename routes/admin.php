@@ -59,8 +59,7 @@ Route::prefix('admin')->name('admin.')
         [UtilisateurController::class, 'deletePhoto']
     )->name('utilisateurs.deletePhoto');
     Route::resource('utilisateurs', UtilisateurController::class);
-    Route::get('/avis', [AvisController::class, 'index'])->name('avis.index');
-    Route::delete('/avis/{avis}', [AvisController::class, 'destroy'])->name('avis.destroy');
+
     
 
     /*
