@@ -22,7 +22,27 @@ if [ -z "$DB_CONNECTION" ]; then
     fi
 fi
 
-echo "Configuring Application..."
+echo "Configuring Apache to listen on port $PORT..."
+
+# 1. Fix "Could not reliably determine the server's fully qualified domain name"
+echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# 2. STRATEGY CHANGE: Force IPv4 Only
+# Our internal tests showed that IPv6 ([::1]) connection was REFUSED, while IPv4 (127.0.0.1) worked.
+# Railway might be trying to hit IPv6 if we advertise it. We will strictly force IPv4.
+echo "Listen 0.0.0.0:$PORT" > /etc/apache2/ports.conf
+
+# 3. Update Default VirtualHost to match the new port
+# Replaces <VirtualHost *:80> or any other port with <VirtualHost *:$PORT>
+sed -i "s/<VirtualHost \*:[0-9]\{1,\}>/<VirtualHost *:$PORT>/g" /etc/apache2/sites-available/000-default.conf
+
+# Verify Configuration changes in logs
+echo "--- APACHE CONFIG CHECK ---"
+echo ">> /etc/apache2/ports.conf:"
+cat /etc/apache2/ports.conf
+echo ">> /etc/apache2/sites-available/000-default.conf ("VirtualHost" line):"
+grep "VirtualHost" /etc/apache2/sites-available/000-default.conf
+echo "--- END CONFIG CHECK ---"
 
 # Run system requirements
 echo "Linking storage..."
@@ -36,24 +56,6 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Start PHP Built-in Server (Temporary Debugging with Internal Check)
-echo "Starting PHP Built-in Server on 0.0.0.0:$PORT..."
-php artisan serve --host=0.0.0.0 --port=$PORT &
-SERVER_PID=$!
-
-echo "Waiting 5 seconds for server startup..."
-sleep 5
-
-echo "--- INTERNAL CONNECTIVITY CHECK ---"
-echo "Testing IPv4 (127.0.0.1:$PORT)..."
-curl -I -v http://127.0.0.1:$PORT || echo ">>> CURL IPv4 FAILED"
-
-echo "Testing IPv6 ([::1]:$PORT)..."
-curl -I -v http://[::1]:$PORT || echo ">>> CURL IPv6 FAILED"
-
-echo "Process Status:"
-ps -p $SERVER_PID -f || echo ">>> PROCESS $SERVER_PID IS DEAD"
-echo "--- END CONNECTIVITY CHECK ---"
-
-# Wait for the server process to keep container alive
-wait $SERVER_PID
+# Start Apache
+echo "Starting Apache..."
+exec apache2-foreground
