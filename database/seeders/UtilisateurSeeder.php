@@ -23,15 +23,19 @@ class UtilisateurSeeder extends Seeder
         $roleAuteur = Role::where('nom', 'Auteur')->first()->id ?? 4;
         $roleLecteur = Role::where('nom', 'Lecteur')->first()->id ?? 5;
 
+        // Récupérer une langue par défaut (Français)
+        $langueFr = \App\Models\Langue::where('code_langue', 'FR')->first();
+        $idLangue = $langueFr ? $langueFr->id_langue : 1;
+
         // Créer un Admin
         Utilisateur::firstOrCreate(
             ['email' => 'admin@culture.bj'],
             [
                 'nom' => 'Administrateur',
                 'prenom' => 'Principal',
-                'password' => Hash::make('password'),
-                'telephone' => '01010101',
+                'mot_de_passe' => Hash::make('password'),
                 'id_role' => $roleAdmin,
+                'id_langue' => $idLangue,
                 'email_verified_at' => now(),
             ]
         );
@@ -42,9 +46,9 @@ class UtilisateurSeeder extends Seeder
             [
                 'nom' => 'Manager',
                 'prenom' => 'Site',
-                'password' => Hash::make('password'),
-                'telephone' => '02020202',
+                'mot_de_passe' => Hash::make('password'),
                 'id_role' => $roleManager,
+                'id_langue' => $idLangue,
                 'email_verified_at' => now(),
             ]
         );
@@ -55,9 +59,9 @@ class UtilisateurSeeder extends Seeder
             [
                 'nom' => 'Modérateur',
                 'prenom' => 'Contenu',
-                'password' => Hash::make('password'),
-                'telephone' => '03030303',
+                'mot_de_passe' => Hash::make('password'),
                 'id_role' => $roleModo,
+                'id_langue' => $idLangue,
                 'email_verified_at' => now(),
             ]
         );
@@ -68,9 +72,9 @@ class UtilisateurSeeder extends Seeder
             [
                 'nom' => 'Auteur',
                 'prenom' => 'Renommé',
-                'password' => Hash::make('password'),
-                'telephone' => '04040404',
+                'mot_de_passe' => Hash::make('password'),
                 'id_role' => $roleAuteur,
+                'id_langue' => $idLangue,
                 'email_verified_at' => now(),
             ]
         );
@@ -81,22 +85,22 @@ class UtilisateurSeeder extends Seeder
             [
                 'nom' => 'Lecteur',
                 'prenom' => 'Passionné',
-                'password' => Hash::make('password'),
-                'telephone' => '05050505',
+                'mot_de_passe' => Hash::make('password'),
                 'id_role' => $roleLecteur,
+                'id_langue' => $idLangue,
                 'email_verified_at' => now(),
             ]
         );
         
-        // Créer un Lecteur pour les tests de paiement (celui qui a peut-être déjà payé)
+        // Créer un Lecteur pour les tests de paiement
         Utilisateur::firstOrCreate(
             ['email' => 'testeur@culture.bj'],
             [
                 'nom' => 'Testeur',
                 'prenom' => 'Paiement',
-                'password' => Hash::make('password'),
-                'telephone' => '97000000',
+                'mot_de_passe' => Hash::make('password'),
                 'id_role' => $roleLecteur,
+                'id_langue' => $idLangue,
                 'email_verified_at' => now(),
             ]
         );
@@ -107,9 +111,9 @@ class UtilisateurSeeder extends Seeder
             [
                 'nom' => 'Comlan',
                 'prenom' => 'Maurice',
-                'password' => Hash::make('Eneam123'),
-                'telephone' => '00000000', // Numéro fictif pour satisfaire les contraintes si nécessaire
+                'mot_de_passe' => Hash::make('Eneam123'),
                 'id_role' => $roleAdmin,
+                'id_langue' => $idLangue,
                 'email_verified_at' => now(),
             ]
         );
