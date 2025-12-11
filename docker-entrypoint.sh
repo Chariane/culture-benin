@@ -27,10 +27,12 @@ echo "Configuring Apache to listen on port $PORT..."
 # 1. Fix "Could not reliably determine the server's fully qualified domain name"
 echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# 2. STRATEGY CHANGE: Overwrite ports.conf entirely.
-# We remove all existing Listen directives (including 443) and set only the one we need.
-# We also avoid specifying 0.0.0.0 to allow Apache to bind to IPv6 if the environment prefers it.
-echo "Listen $PORT" > /etc/apache2/ports.conf
+# 2. STRATEGY CHANGE: Explicit Dual Stack Binding
+# We write two Listen directives to ensure both IPv4 and IPv6 are covered explicitly.
+{
+    echo "Listen 0.0.0.0:$PORT"
+    echo "Listen [::]:$PORT"
+} > /etc/apache2/ports.conf
 
 # 3. Update Default VirtualHost to match the new port
 # Replaces <VirtualHost *:80> or any other port with <VirtualHost *:$PORT>
@@ -40,12 +42,10 @@ sed -i "s/<VirtualHost \*:[0-9]\{1,\}>/<VirtualHost *:$PORT>/g" /etc/apache2/sit
 echo "--- APACHE CONFIG CHECK ---"
 echo ">> /etc/apache2/ports.conf:"
 cat /etc/apache2/ports.conf
-echo ">> /etc/apache2/sites-available/000-default.conf (top):"
-grep "VirtualHost" /etc/apache2/sites-available/000-default.conf | head -n 1
-echo ">> Checking for other 'Listen' directives in /etc/apache2:"
-grep -r "Listen" /etc/apache2/ || true
-echo ">> Checking enabled sites:"
-ls -l /etc/apache2/sites-enabled/
+echo ">> /etc/apache2/sites-available/000-default.conf FULL CONTENT:"
+cat /etc/apache2/sites-available/000-default.conf
+echo ">> Apache VirtualHost Dump (apache2 -S):"
+apache2 -S || true
 echo "--- END CONFIG CHECK ---"
 
 # Run system requirements
