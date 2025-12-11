@@ -9,24 +9,36 @@ return new class extends Migration
 {
     public function up()
     {
-        // supprimer l’ancienne contrainte
-        DB::statement('ALTER TABLE contenus DROP CONSTRAINT contenus_id_type_contenu_foreign');
-
-        // recréer en RESTRICT
-        DB::statement('ALTER TABLE contenus 
-            ADD CONSTRAINT contenus_id_type_contenu_foreign
-            FOREIGN KEY (id_type_contenu)
-            REFERENCES type_contenus(id_type_contenu)
-            ON DELETE RESTRICT');
+        Schema::table('contenus', function (Blueprint $table) {
+            // SQLite ne supporte pas toujours dropForeign avec le nom simple,
+            // mais Laravel le gère si on utilise la méthode Schema
+            if (DB::getDriverName() !== 'sqlite') {
+                $table->dropForeign('contenus_id_type_contenu_foreign');
+            } else {
+                // Pour SQLite, c'est plus compliqué car il faut souvent recréer la table
+                // Mais essayons la méthode standard Laravel qui tente de gérer ça
+                $table->dropForeign(['id_type_contenu']);
+            }
+            
+            $table->foreign('id_type_contenu')
+                  ->references('id_type_contenu')
+                  ->on('type_contenus')
+                  ->onDelete('restrict');
+        });
     }
 
     public function down()
     {
-        DB::statement('ALTER TABLE contenus DROP CONSTRAINT contenus_id_type_contenu_foreign');
+        Schema::table('contenus', function (Blueprint $table) {
+            if (DB::getDriverName() !== 'sqlite') {
+                $table->dropForeign('contenus_id_type_contenu_foreign');
+            } else {
+                $table->dropForeign(['id_type_contenu']);
+            }
 
-        DB::statement('ALTER TABLE contenus 
-            ADD CONSTRAINT contenus_id_type_contenu_foreign
-            FOREIGN KEY (id_type_contenu)
-            REFERENCES type_contenus(id_type_contenu)');
+            $table->foreign('id_type_contenu')
+                  ->references('id_type_contenu')
+                  ->on('type_contenus');
+        });
     }
 };
