@@ -10,6 +10,12 @@ echo "DB_CONNECTION is set to: '$DB_CONNECTION'"
 echo "DB_HOST is set to: '$DB_HOST'"
 echo "--- END DEBUG ---"
 
+if [ -z "$DB_CONNECTION" ]; then
+    echo "ERROR: DB_CONNECTION variable is missing!"
+    echo "Please configure it in Railway variables."
+    exit 1
+fi
+
 echo "Configuring Apache to listen on port $PORT..."
 # Replace 'Listen 80' with 'Listen $PORT' (exact match)
 sed -i "s/^Listen 80$/Listen $PORT/g" /etc/apache2/ports.conf
