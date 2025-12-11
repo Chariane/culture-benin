@@ -45,6 +45,12 @@ grep "VirtualHost" /etc/apache2/sites-available/000-default.conf
 echo "--- END CONFIG CHECK ---"
 
 # Run system requirements
+echo "Fixing permissions..."
+# Ensure log file exists and has correct permissions
+touch /var/www/html/storage/logs/laravel.log
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
+
 echo "Linking storage..."
 php artisan storage:link || true
 

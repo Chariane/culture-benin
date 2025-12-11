@@ -37,7 +37,8 @@ class ProfilController extends Controller
         
         $views = \App\Models\View::where('id_utilisateur', $user->id_utilisateur)
             ->with('contenu')
-            ->orderBy('date', 'desc')
+            ->with('contenu')
+            ->orderBy('created_at', 'desc')
             ->take(5)
             ->get()
             ->map(function($view) {
@@ -47,7 +48,8 @@ class ProfilController extends Controller
             
         $likes = \App\Models\Like::where('id_utilisateur', $user->id_utilisateur)
             ->with('contenu')
-            ->orderBy('date', 'desc')
+            ->with('contenu')
+            ->orderBy('created_at', 'desc')
             ->take(5)
             ->get()
             ->map(function($like) {
@@ -57,7 +59,8 @@ class ProfilController extends Controller
             
         $comments = \App\Models\Commentaire::where('id_utilisateur', $user->id_utilisateur)
             ->with('contenu')
-            ->orderBy('date', 'desc')
+            ->with('contenu')
+            ->orderBy('created_at', 'desc')
             ->take(5)
             ->get()
             ->map(function($comment) {
@@ -66,7 +69,7 @@ class ProfilController extends Controller
             });
         
         $activites = $views->merge($likes)->merge($comments)
-            ->sortByDesc('date')
+            ->sortByDesc('created_at')
             ->take(5);
         
         return view('user.profil.show', compact('user', 'photoUrl', 'stats', 'activites', 'langues'));
@@ -193,19 +196,22 @@ private function getUserPhotoUrl($user)
         // Vues récentes
         $views = \App\Models\View::where('id_utilisateur', $user->id_utilisateur)
             ->with('contenu')
-            ->orderBy('date', 'desc')
+            ->with('contenu')
+            ->orderBy('created_at', 'desc')
             ->paginate(10, ['*'], 'views_page');
             
         // Commentaires récents
         $comments = \App\Models\Commentaire::where('id_utilisateur', $user->id_utilisateur)
             ->with('contenu')
-            ->orderBy('date', 'desc')
+            ->with('contenu')
+            ->orderBy('created_at', 'desc')
             ->paginate(10, ['*'], 'comments_page');
             
         // Likes récents
         $likes = \App\Models\Like::where('id_utilisateur', $user->id_utilisateur)
             ->with('contenu')
-            ->orderBy('date', 'desc')
+            ->with('contenu')
+            ->orderBy('created_at', 'desc')
             ->paginate(10, ['*'], 'likes_page');
             
         // Achats récents
@@ -223,7 +229,7 @@ private function getUserPhotoUrl($user)
         $photoUrl = $this->getUserPhotoUrl($user);
         
         $notifications = $user->notifications()
-            ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate(20);
             
         return view('user.profil.notifications', compact('user', 'photoUrl', 'notifications'));
