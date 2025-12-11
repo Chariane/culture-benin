@@ -30,8 +30,8 @@ class MediaSeeder extends Seeder
         foreach ($contenus as $contenu) {
             Media::create([
                 'id_type_media' => $idTypeImage,
-                'nom_fichier' => 'culture-beninoise.jpg', 
-                'chemin_fichier' => 'images/culture-beninoise.jpg',
+                // 'nom_fichier' n'existe pas dans la base
+                'chemin' => 'images/culture-beninoise.jpg', // Renommé 'chemin_fichier' -> 'chemin'
                 'id_contenu' => $contenu->id_contenu,
                 'id_langue' => $idLangue
             ]);
