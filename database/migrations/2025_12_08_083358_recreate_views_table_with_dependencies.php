@@ -9,8 +9,10 @@ return new class extends Migration
 {
     public function up()
     {
-        // 1. Supprimer la vue matérialisée si elle existe
-        DB::statement('DROP MATERIALIZED VIEW IF EXISTS vue_statistiques_contenu');
+        // 1. Supprimer la vue matérialisée si elle existe (uniquement pour PostgreSQL)
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('DROP MATERIALIZED VIEW IF EXISTS vue_statistiques_contenu');
+        }
         
         // 2. Supprimer la table existante si elle existe
         Schema::dropIfExists('views');
@@ -52,7 +54,9 @@ return new class extends Migration
     public function down()
     {
         // En cas de rollback, nous supprimons la table et la vue matérialisée.
-        DB::statement('DROP MATERIALIZED VIEW IF EXISTS vue_statistiques_contenu');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('DROP MATERIALIZED VIEW IF EXISTS vue_statistiques_contenu');
+        }
         Schema::dropIfExists('views');
         
         // Note: Si vous aviez une vue matérialisée avant, vous devriez la recréer dans le down() aussi.

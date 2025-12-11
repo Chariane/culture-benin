@@ -4,6 +4,12 @@ set -e
 # Default to 80 if PORT is not set
 PORT=${PORT:-80}
 
+# Debug Environment
+echo "--- ENVIRONMENT DEBUG ---"
+echo "DB_CONNECTION is set to: '$DB_CONNECTION'"
+echo "DB_HOST is set to: '$DB_HOST'"
+echo "--- END DEBUG ---"
+
 echo "Configuring Apache to listen on port $PORT..."
 # Replace 'Listen 80' with 'Listen $PORT' (exact match)
 sed -i "s/^Listen 80$/Listen $PORT/g" /etc/apache2/ports.conf
