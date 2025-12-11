@@ -120,9 +120,11 @@ class FavoriController extends Controller
             
             // Récupérer les favoris avec pagination
             $favorisQuery = Favori::where('id_utilisateur', $user->id_utilisateur)
+                ->whereHas('contenu', function($query) {
+                    $query->where('statut', 'Bon');
+                })
                 ->with(['contenu' => function($query) {
-                    $query->with(['type', 'region', 'auteur', 'medias']) // Changez 'typeContenu' en 'type'
-                        ->where('statut', 'Bon');
+                    $query->with(['type', 'region', 'auteur', 'medias']);
                 }])
                 ->orderBy('date_ajout', 'desc');
             

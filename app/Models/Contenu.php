@@ -19,7 +19,6 @@ class Contenu extends Model
         'date_validation' => 'datetime',
         'premium' => 'boolean',
         'prix' => 'decimal:2',
-        'statut' => 'integer',
     ];
 
     // Relations existantes
