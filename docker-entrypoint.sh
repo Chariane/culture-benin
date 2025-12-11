@@ -59,7 +59,7 @@ php artisan migrate --force
 
 echo "Seeding database..."
 # We use || true to prevent the container from crashing if seeds are already present (duplicate errors)
-php artisan db:seed --force || true
+php artisan db:seed --force > /var/www/html/storage/logs/seed_output.log 2>&1 || true
 
 echo "Caching configuration..."
 php artisan config:cache

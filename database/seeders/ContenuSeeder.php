@@ -13,11 +13,35 @@ class ContenuSeeder extends Seeder
      */
     public function run(): void
     {
-        $typeArticle = \App\Models\TypeContenu::where('nom_contenu', 'Article')->first()->id_type_contenu ?? 1;
-        $region = \App\Models\Region::first()->id_region ?? 1;
-        $langue = \App\Models\Langue::first()->id_langue ?? 1;
-        $auteur = \App\Models\Utilisateur::where('email', 'auteur@culture.bj')->first()->id_utilisateur ?? 1;
-        $moderateur = \App\Models\Utilisateur::where('email', 'modo@culture.bj')->first()->id_utilisateur ?? 1;
+        // Initialisation robuste des clés étrangères
+        // Si le type spécifique n'est pas trouvé, on prend le premier disponible pour éviter le crash FK
+        $typeArticleObj = \App\Models\TypeContenu::where('nom_contenu', 'Article')->first() 
+                         ?? \App\Models\TypeContenu::first();
+        $typeArticle = $typeArticleObj ? $typeArticleObj->id_type_contenu : null;
+
+        $typeVideoObj = \App\Models\TypeContenu::where('nom_contenu', 'Vidéo')->first() 
+                       ?? \App\Models\TypeContenu::first();
+        $typeVideo = $typeVideoObj ? $typeVideoObj->id_type_contenu : null;
+
+        $regionObj = \App\Models\Region::first();
+        $region = $regionObj ? $regionObj->id_region : null;
+
+        $langueObj = \App\Models\Langue::first();
+        $langue = $langueObj ? $langueObj->id_langue : null;
+
+        $auteurObj = \App\Models\Utilisateur::where('email', 'auteur@culture.bj')->first() 
+                    ?? \App\Models\Utilisateur::first();
+        $auteur = $auteurObj ? $auteurObj->id_utilisateur : null;
+
+        $moderateurObj = \App\Models\Utilisateur::where('email', 'modo@culture.bj')->first() 
+                        ?? \App\Models\Utilisateur::first();
+        $moderateur = $moderateurObj ? $moderateurObj->id_utilisateur : null;
+
+        // Si une des tables est vide, impossible de créer du contenu
+        if (!$typeArticle || !$region || !$langue || !$auteur) {
+            $this->command->error("Impossible de créer des contenus : Données dépendantes manquantes (Type/Region/Langue/User).");
+            return;
+        }
 
         Contenu::create([
             'titre' => '100 marmites de 50 kg en 24h : le défi XXL de Eden Food',
@@ -44,7 +68,7 @@ class ContenuSeeder extends Seeder
             'id_region' => $region,
             'id_langue' => $langue,
             'id_auteur' => $auteur,
-            'id_type_contenu' => \App\Models\TypeContenu::where('nom_contenu', 'Vidéo')->first()->id_type_contenu ?? 1,
+            'id_type_contenu' => $typeVideo,
             'id_moderateur' => $moderateur,
             'premium' => true,
             'prix' => 500.00

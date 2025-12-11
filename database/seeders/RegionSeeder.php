@@ -51,7 +51,7 @@ class RegionSeeder extends Seeder
         ];
 
         foreach ($regions as $region) {
-            Region::create($region);
+            Region::firstOrCreate(['nom_region' => $region['nom_region']], $region);
         }
     }
 }

@@ -12,14 +12,14 @@ class LangueSeeder extends Seeder
      */
     public function run(): void
     {
-        Langue::create(['code_langue'=>'FR', 'nom_langue'=>'Français']);
-        Langue::create(['code_langue'=>'EN', 'nom_langue'=>'English']);
-        Langue::create(['code_langue'=>'GN', 'nom_langue'=>'Goun']);
-        Langue::create(['code_langue'=>'FN', 'nom_langue'=>'Fon']);
-        Langue::create(['code_langue'=>'YB', 'nom_langue'=>'Yoruba']);
-        Langue::create(['code_langue'=>'DN', 'nom_langue'=>'Dendi']);
-        Langue::create(['code_langue'=>'MN', 'nom_langue'=>'Mina']);
-        Langue::create(['code_langue'=>'TR', 'nom_langue'=>'Tori']);
-        Langue::create(['code_langue'=>'NT', 'nom_langue'=>'Natimba']);
+        Langue::firstOrCreate(['code_langue'=>'FR'], ['nom_langue'=>'Français']);
+        Langue::firstOrCreate(['code_langue'=>'EN'], ['nom_langue'=>'English']);
+        Langue::firstOrCreate(['code_langue'=>'GN'], ['nom_langue'=>'Goun']);
+        Langue::firstOrCreate(['code_langue'=>'FN'], ['nom_langue'=>'Fon']);
+        Langue::firstOrCreate(['code_langue'=>'YB'], ['nom_langue'=>'Yoruba']);
+        Langue::firstOrCreate(['code_langue'=>'DN'], ['nom_langue'=>'Dendi']);
+        Langue::firstOrCreate(['code_langue'=>'MN'], ['nom_langue'=>'Mina']);
+        Langue::firstOrCreate(['code_langue'=>'TR'], ['nom_langue'=>'Tori']);
+        Langue::firstOrCreate(['code_langue'=>'NT'], ['nom_langue'=>'Natimba']);
     }
 }
