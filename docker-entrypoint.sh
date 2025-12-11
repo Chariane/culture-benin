@@ -14,6 +14,7 @@ if [ -z "$DB_CONNECTION" ]; then
     if [ -n "$DATABASE_URL" ]; then
         echo "WARNING: DB_CONNECTION missing, but DATABASE_URL found. Defaulting to 'pgsql'."
         export DB_CONNECTION=pgsql
+        export DB_URL="$DATABASE_URL"
     else
         echo "ERROR: DB_CONNECTION variable is missing and no DATABASE_URL found!"
         echo "Please configure it in Railway variables."
