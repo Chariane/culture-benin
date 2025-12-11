@@ -36,7 +36,6 @@ class UtilisateurSeeder extends Seeder
                 'mot_de_passe' => Hash::make('password'),
                 'id_role' => $roleAdmin,
                 'id_langue' => $idLangue,
-                'email_verified_at' => now(),
             ]
         );
 
@@ -49,7 +48,6 @@ class UtilisateurSeeder extends Seeder
                 'mot_de_passe' => Hash::make('password'),
                 'id_role' => $roleManager,
                 'id_langue' => $idLangue,
-                'email_verified_at' => now(),
             ]
         );
 
@@ -62,7 +60,6 @@ class UtilisateurSeeder extends Seeder
                 'mot_de_passe' => Hash::make('password'),
                 'id_role' => $roleModo,
                 'id_langue' => $idLangue,
-                'email_verified_at' => now(),
             ]
         );
 
@@ -75,7 +72,6 @@ class UtilisateurSeeder extends Seeder
                 'mot_de_passe' => Hash::make('password'),
                 'id_role' => $roleAuteur,
                 'id_langue' => $idLangue,
-                'email_verified_at' => now(),
             ]
         );
 
@@ -88,7 +84,6 @@ class UtilisateurSeeder extends Seeder
                 'mot_de_passe' => Hash::make('password'),
                 'id_role' => $roleLecteur,
                 'id_langue' => $idLangue,
-                'email_verified_at' => now(),
             ]
         );
         
@@ -101,7 +96,6 @@ class UtilisateurSeeder extends Seeder
                 'mot_de_passe' => Hash::make('password'),
                 'id_role' => $roleLecteur,
                 'id_langue' => $idLangue,
-                'email_verified_at' => now(),
             ]
         );
 
@@ -114,7 +108,6 @@ class UtilisateurSeeder extends Seeder
                 'mot_de_passe' => Hash::make('Eneam123'),
                 'id_role' => $roleAdmin,
                 'id_langue' => $idLangue,
-                'email_verified_at' => now(),
             ]
         );
     }
