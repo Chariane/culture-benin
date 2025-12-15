@@ -9,8 +9,11 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     && docker-php-ext-install pdo pdo_pgsql zip
 
-# Activer mod_rewrite pour Laravel
-RUN a2enmod rewrite
+# Activer mod_rewrite pour Laravel et corriger MPM
+RUN a2enmod rewrite \
+    && a2dismod mpm_event || true \
+    && a2dismod mpm_worker || true \
+    && a2enmod mpm_prefork
 
 # Configurer le DocumentRoot Apache vers le dossier public
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
