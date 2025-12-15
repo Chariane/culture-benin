@@ -8,11 +8,11 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('views', function (Blueprint $table) {
+        Schema::create('likes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_contenu');
             $table->unsignedBigInteger('id_utilisateur');
-            $table->date('date')->nullable(); // Nombre de vues par utilisateur pour ce contenu
+            $table->date('date')->nullable();
             
             $table->timestamps();
 
@@ -27,7 +27,7 @@ return new class extends Migration
                 ->on('utilisateurs')
                 ->onDelete('cascade');
 
-            // Empêcher les doublons - un utilisateur ne peut avoir qu'une entrée par contenu
+            // Empêcher les doublons
             $table->unique(['id_contenu', 'id_utilisateur']);
         });
     }

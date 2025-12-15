@@ -30,7 +30,7 @@ class CommentaireController extends Controller
         
         $validator = Validator::make($request->all(), [
             'id_contenu' => 'required|exists:contenus,id_contenu',
-            'texte' => 'required|string|min:3|max:1000',
+            'texte' => 'required|string|min:1|max:1000',
             'note' => 'nullable|integer|min:1|max:5',
         ]);
         
@@ -92,7 +92,7 @@ class CommentaireController extends Controller
         }
         
         $validator = Validator::make($request->all(), [
-            'texte' => 'required|string|min:3|max:1000',
+            'texte' => 'required|string|min:1|max:1000',
             'note' => 'nullable|integer|min:1|max:5',
         ]);
         

@@ -971,15 +971,20 @@ fetch('/api/likes/check/{{ $contenu->id_contenu }}', {
                 .then(response => response.json())
                 .then(data => {
                     if (data.errors) {
-                        // Afficher les erreurs de validation
+                        // Afficher les erreurs de validation de manière détaillée
+                        let errorMessage = '<ul>';
                         for (const field in data.errors) {
                             const errorElement = document.getElementById(`${field}-error`);
                             if (errorElement) {
                                 errorElement.textContent = data.errors[field][0];
                                 errorElement.classList.remove('hidden');
                             }
+                            // Ajouter à la notification globale aussi
+                            errorMessage += `<li>${data.errors[field][0]}</li>`;
                         }
-                        showNotification('Veuillez corriger les erreurs dans le formulaire', 'error');
+                        errorMessage += '</ul>';
+                        
+                        showNotification('Erreur de validation:<br>' + errorMessage, 'error');
                     } else if (data.success || data.message) {
                         // Afficher le message de succès
                         showNotification(data.message || 'Commentaire ajouté avec succès', 'success');
@@ -987,6 +992,10 @@ fetch('/api/likes/check/{{ $contenu->id_contenu }}', {
                         // Réinitialiser le formulaire
                         commentForm.reset();
                         clearRating();
+                        const commentTextError = document.getElementById('comment-text-error');
+                        if (commentTextError) commentTextError.classList.add('hidden');
+                        const noteError = document.getElementById('note-error');
+                        if (noteError) noteError.classList.add('hidden');
                         
                         // Ajouter le nouveau commentaire à la liste
                         if (data.comment) {
