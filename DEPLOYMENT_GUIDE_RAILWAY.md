@@ -78,11 +78,15 @@ railway run php artisan migrate --force
 railway run php artisan storage:link
 ```
 
-Ou, plus simplement, utilisez la commande suivante comme **"Start Command"** dans les paramètres Railway (Settings > Service > Start Command) :
-```bash
-php artisan migrate --force && php artisan storage:link && php artisan config:cache && php artisan route:cache && php artisan view:cache && apache2-foreground
-```
-*(Si vous utilisez l'image docker par défaut ou heroku buildpacks. Si vous utilisez Nixpacks (défaut), la commande de démarrage est gérée automatiquement, mais vous pouvez la surcharger).*
+### ⚠️ Correction Importante : Command de Démarrage (Start Command)
+
+**Puisque votre projet contient un `Dockerfile`, vous ne devez PAS utiliser de commande de démarrage personnalisée.**
+
+1. Allez dans **Settings** > **Deploy** > **Start Command**.
+2. **EFFACEZ** tout le contenu de ce champ (laissez-le vide).
+3. Railway utilisera automatiquement la commande définie dans votre `Dockerfile` (qui est gérée par notre script `docker-entrypoint.sh` corrigé).
+
+*(Si vous laissez une commande ici, elle entrera en conflit avec Docker et fera planter le site).*
 
 Si vous utilisez Nixpacks (le défaut), mettez ceci en **Start Command** :
 ```bash
