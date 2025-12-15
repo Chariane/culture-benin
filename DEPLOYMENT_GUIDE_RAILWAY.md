@@ -38,8 +38,10 @@ Ce guide vous explique étape par étape comment héberger votre application Lar
 | `APP_URL` | L'URL que Railway vous donnera (dans l'onglet Settings > Domains) |
 | `DB_CONNECTION` | `pgsql` |
 | `DB_URL` | `${DATABASE_URL}` (Ceci va automatiquement récupérer l'URL de la base PostgreSQL ajoutée) |
-| `FEDAPAY_SECRET_KEY` | Votre clé secrète FedaPay (Live ou Sandbox selon votre choix) |
-| `FEDAPAY_PUBLIC_KEY` | Votre clé publique FedaPay |
+| `FEDAPAY_LIVE_SECRET_KEY` | Votre clé secrète FedaPay Live (commence par `sk_live_`) |
+| `FEDAPAY_LIVE_PUBLIC_KEY` | Votre clé publique FedaPay Live (commence par `pk_live_`) |
+| `FEDAPAY_SANDBOX_SECRET_KEY` | Votre clé secrète FedaPay Sandbox (commence par `sk_sandbox_`) |
+| `FEDAPAY_SANDBOX_PUBLIC_KEY` | Votre clé publique FedaPay Sandbox (commence par `pk_sandbox_`) |
 | `FEDAPAY_ENVIRONMENT` | `live` (pour la prod) ou `sandbox` |
 
 **Note sur la Base de données :** Grâce à la variable `DB_URL=${DATABASE_URL}`, vous n'avez pas besoin de remplir `DB_HOST`, `DB_PORT`, etc. Railway fera le lien automatiquement si vous avez ajouté le service PostgreSQL dans le même projet.
@@ -84,7 +86,7 @@ php artisan migrate --force && php artisan storage:link && php artisan config:ca
 
 Si vous utilisez Nixpacks (le défaut), mettez ceci en **Start Command** :
 ```bash
-php artisan migrate --force && php artisan storage:link && python /app/start.py
+php artisan storage:link && php artisan migrate --force && python /app/start.py
 ```
 *(Attention : la commande exacte de démarrage de Nixpacks peut varier, le plus sûr pour les migrations est de les faire via le CLI).*
 
