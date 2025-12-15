@@ -639,23 +639,40 @@ fetch('/api/likes/check/{{ $contenu->id_contenu }}', {
 });
     // Gestion des likes
     function toggleLike(contenuId) {
+        const icon = document.getElementById(`like-icon-${contenuId}`);
+        // Animation de chargement
+        const originalClass = icon.className;
+        icon.className = 'fas fa-spinner fa-spin text-benin-500';
+
         fetch(`/api/likes/toggle`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
             },
             body: JSON.stringify({ id_contenu: contenuId })
         })
-        .then(response => response.json())
+        .then(async response => {
+            if (!response.ok) {
+                const status = response.status;
+                if (status === 419) throw new Error("Erreur CSRF (Session expirée). Rafraîchissez la page.");
+                if (status === 401) throw new Error("Vous n'êtes plus connecté.");
+                if (status === 500) throw new Error("Erreur serveur interne.");
+                throw new Error(`Erreur HTTP: ${status}`);
+            }
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error("Réponse serveur invalide (HTML reçu au lieu de JSON). Peut-être une redirection ?");
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                const icon = document.getElementById(`like-icon-${contenuId}`);
                 const count = document.getElementById(`like-count-${contenuId}`);
                 
                 if (data.liked) {
                     icon.className = 'fas fa-heart text-red-500';
-                    // Animation de like
                     icon.classList.add('animate-pulse');
                     setTimeout(() => icon.classList.remove('animate-pulse'), 500);
                     showNotification('Contenu liké', 'success');
@@ -666,79 +683,68 @@ fetch('/api/likes/check/{{ $contenu->id_contenu }}', {
                 
                 count.textContent = data.total_likes;
             } else {
-                showNotification('Erreur lors de l\'ajout du like', 'error');
+                icon.className = originalClass; // Restaurer en cas d'échec logique
+                showNotification(data.message || 'Erreur lors de l\'ajout du like', 'error');
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            showNotification('Une erreur est survenue', 'error');
+            console.error('Like Error:', error);
+            icon.className = originalClass; // Restaurer en cas d'erreur
+            showNotification(error.message || 'Une erreur est survenue', 'error');
         });
     }
     
     // Gestion des favoris
     function toggleFavorite(contenuId) {
-    console.log('=== DEBUG TOGGLE FAVORI ===');
-    console.log('Contenu ID:', contenuId);
-    console.log('CSRF Token:', document.querySelector('meta[name="csrf-token"]')?.content);
-    console.log('User authenticated:', {{ auth()->check() ? 'true' : 'false' }});
-    
-    const icon = document.getElementById(`favorite-icon-${contenuId}`);
-    
-    // Sauvegarder l'état actuel pour pouvoir le restaurer en cas d'erreur
-    const isCurrentlyFavorite = icon.classList.contains('fas');
-    
-    // Montrer un indicateur de chargement
-    icon.className = 'fas fa-spinner fa-spin text-gray-400';
-    
-    // Utiliser la route web (pas API) - c'est la route définie dans le groupe auth
-    fetch(`{{ route('favoris.toggle') }}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({ id_contenu: contenuId })
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Response data:', data);
+        const icon = document.getElementById(`favorite-icon-${contenuId}`);
+        const isCurrentlyFavorite = icon.classList.contains('fas');
         
-        if (data.success) {
-            if (data.is_favorite) {
-                icon.className = 'fas fa-bookmark text-yellow-500';
-                // Animation de favori
-                icon.classList.add('animate-bounce');
-                setTimeout(() => icon.classList.remove('animate-bounce'), 500);
-                showNotification(data.message, 'success');
-            } else {
-                icon.className = 'far fa-bookmark text-gray-400';
-                showNotification(data.message, 'info');
+        // Indicateur de chargement
+        icon.className = 'fas fa-spinner fa-spin text-gray-400';
+        
+        fetch(`{{ route('favoris.toggle') }}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ id_contenu: contenuId })
+        })
+        .then(async response => {
+            if (!response.ok) {
+                if (response.status === 419) throw new Error("Session expirée (CSRF). Rafraîchissez.");
+                if (response.status === 401) throw new Error("Connectez-vous à nouveau.");
+                throw new Error(`Erreur serveur: ${response.status}`);
             }
-        } else {
-            // En cas d'erreur, restaurer l'état précédent
-            if (isCurrentlyFavorite) {
-                icon.className = 'fas fa-bookmark text-yellow-500';
-            } else {
-                icon.className = 'far fa-bookmark text-gray-400';
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error("Réponse invalide (HTML).");
             }
-            showNotification(data.message || 'Erreur lors de l\'opération', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Fetch error:', error);
-        // Restaurer l'état précédent
-        if (isCurrentlyFavorite) {
-            icon.className = 'fas fa-bookmark text-yellow-500';
-        } else {
-            icon.className = 'far fa-bookmark text-gray-400';
-        }
-        showNotification('Erreur de connexion. Veuillez réessayer.', 'error');
-    });
-}
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                if (data.is_favorite) {
+                    icon.className = 'fas fa-bookmark text-yellow-500';
+                    icon.classList.add('animate-bounce');
+                    setTimeout(() => icon.classList.remove('animate-bounce'), 500);
+                    showNotification(data.message, 'success');
+                } else {
+                    icon.className = 'far fa-bookmark text-gray-400';
+                    showNotification(data.message, 'info');
+                }
+            } else {
+                throw new Error(data.message || 'Erreur inconnue');
+            }
+        })
+        .catch(error => {
+            console.error('Favorite Error:', error);
+            // Restauration état visuel
+            icon.className = isCurrentlyFavorite ? 'fas fa-bookmark text-yellow-500' : 'far fa-bookmark text-gray-400';
+            showNotification(error.message, 'error');
+        });
+    }
     
     // Gestion des abonnements
     function toggleSubscribe(auteurId) {
