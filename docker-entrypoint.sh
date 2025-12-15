@@ -67,4 +67,10 @@ php artisan view:cache
 
 # Start Apache
 echo "Starting Apache..."
+# Fix for "More than one MPM loaded" error
+echo "Ensuring only mpm_prefork is enabled..."
+a2dismod -f mpm_event || true
+a2dismod -f mpm_worker || true
+a2enmod mpm_prefork || true
+
 exec apache2-foreground
